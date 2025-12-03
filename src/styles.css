@@ -1,0 +1,932 @@
+:root {
+  --bg: #0f172a;
+  --card: #0b1220;
+  --accent: #60a5fa;
+  --ok: #10b981;
+  --bad: #ef4444;
+  --muted: #94a3b8;
+  --glass: rgba(255, 255, 255, 0.03);
+  --surface-radius: 12px;
+}
+[data-theme="light"] {
+  --bg: #f6f8fb;
+  --card: #ffffff;
+  --accent: #2563eb;
+  --ok: #059669;
+  --bad: #dc2626;
+  --muted: #475569;
+  --glass: rgba(0, 0, 0, 0.04);
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Inter, system-ui, Arial;
+  background: var(--bg);
+  color: var(--muted);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 24px;
+  transition: background 0.25s, color 0.25s;
+}
+.page {
+  width: min(1100px, 96%);
+  position: relative;
+}
+
+/* NAVBAR */
+.nav {
+  width: 770px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 12px;
+  margin-bottom: 16px;
+  border: 2px solid var(--glass);
+  border-radius: var(--surface-radius);
+}
+.brand {
+  font-size: 45px;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.navControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navControls button {
+  outline: none;
+}
+
+.navTheme {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+/* two-column layout */
+.content {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 18px;
+  align-items: start;
+  border: 2px solid var(--glass);
+  border-radius: var(--surface-radius);
+  width: 770px;
+  padding: 10px;
+}
+@media (max-width: 900px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+  .aside {
+    order: 2;
+  }
+  .main {
+    order: 1;
+  }
+}
+
+/* MAIN container */
+.main {
+  background: transparent;
+  padding: 8px 12px;
+  border-radius: var(--surface-radius);
+}
+
+.topControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+.progressLarge {
+  flex: 1;
+}
+.progressLabel {
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: var(--muted);
+}
+.progressBar {
+  height: 14px;
+  background: var(--glass);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progressBar .bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #7dd3fc);
+  transition: width 0.25s linear;
+}
+
+.startWrap {
+  width: 120px;
+  display: flex;
+  justify-content: flex-end;
+}
+.startBtn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--card);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  color: var(--muted);
+}
+
+/* game area */
+.gameWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  padding: 8px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  justify-items: center;
+}
+.cell {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  background: var(--card);
+  transition: transform 0.12s, box-shadow 0.12s, background 0.12s;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+  cursor: pointer;
+}
+.cell.flashing {
+  transform: scale(1.06);
+  box-shadow: 0 10px 28px rgba(2, 6, 23, 0.12);
+  background: linear-gradient(135deg, var(--accent) 22, var(--accent) 44);
+}
+
+/* Strong visible selection for both themes */
+.cell.selected {
+  outline: 3px solid rgba(96, 165, 250, 0.45); /* stronger blue ring */
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.25) inset,
+    0 4px 12px rgba(96, 165, 250, 0.25); /* soft glow */
+  background: rgba(96, 165, 250, 0.18); /* light blue fill */
+  transform: translateY(-2px);
+  transition: background 0.15s, box-shadow 0.15s, outline 0.15s;
+}
+
+/* Light mode stronger visibility */
+[data-theme="light"] .cell.selected {
+  outline: 3px solid rgba(37, 99, 235, 0.55); /* strong blue */
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.3) inset,
+    0 4px 12px rgba(37, 99, 235, 0.25);
+  background: rgba(37, 99, 235, 0.22); /* deeper blue fill */
+}
+
+/* Improved CORRECT state (dark mode baseline) */
+.cell.correct {
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.65),
+    rgba(16, 185, 129, 0.85)
+  );
+  border: 1px solid rgba(16, 185, 129, 0.6);
+  outline: 2px solid rgba(16, 185, 129, 0.25); /* subtle glow */
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+  color: #ffffff;
+}
+
+[data-theme="light"] .cell.correct {
+  background: linear-gradient(
+    135deg,
+    rgba(5, 150, 105, 0.25),
+    rgba(5, 150, 105, 0.45)
+  );
+  border: 1px solid rgba(5, 150, 105, 0.55); /* clearer green border */
+  outline: 2px solid rgba(5, 150, 105, 0.2); /* glow outline */
+}
+
+.cell.wrong {
+  /* stronger, richer red for immediate feedback */
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.78),
+    rgba(239, 68, 68, 0.95)
+  );
+  border: 1px solid rgba(239, 68, 68, 0.75);
+  outline: 2px solid rgba(239, 68, 68, 0.18); /* subtle glow */
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.18);
+  color: #fff; /* ensure any text/icon is readable */
+  transition: transform 0.12s ease, box-shadow 0.15s ease, outline 0.12s;
+}
+
+/* -------------------------
+   Light-mode override (clear on white)
+   ------------------------- */
+[data-theme="light"] .cell.wrong {
+  background: linear-gradient(
+    135deg,
+    rgba(220, 38, 38, 0.28),
+    rgba(220, 38, 38, 0.48)
+  );
+  border: 1px solid rgba(220, 38, 38, 0.62);
+  outline: 2px solid rgba(220, 38, 38, 0.22);
+  box-shadow: 0 8px 18px rgba(220, 38, 38, 0.14);
+  color: #2b0b0b; /* dark text on light background */
+}
+
+.pop {
+  animation: pop 0.32s ease-out;
+}
+.shake {
+  animation: shake 0.36s;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.8);
+  }
+  60% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* bottom controls */
+.bottomControls {
+  width: 240px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 12px;
+}
+button.primary {
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--accent), #7dd3fc);
+  border: none;
+  color: #052036;
+  font-weight: 700;
+  cursor: pointer;
+}
+.bottomControls button {
+  width: 100px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--card);
+  border: 3px solid rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 700;
+  outline: none;
+}
+
+/* ASIDE */
+.aside {
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: stretch;
+  padding-top: 50px;
+}
+.scoreCard {
+  width: 240px;
+  background: var(--card);
+  padding: 5px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
+  text-align: center;
+  height: 120px;
+}
+.scoreCardTitle {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.scoreCardValue {
+  font-weight: 800;
+  font-size: 35px;
+  color: var(--accent);
+}
+
+/* overlay modal */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0.6), rgba(2, 6, 23, 0.7));
+  z-index: 1100;
+}
+.modal {
+  background: var(--card);
+  padding: 22px 28px;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(2, 6, 23, 0.6);
+  text-align: center;
+  color: var(--muted);
+  min-width: 280px;
+}
+.modal h2 {
+  margin: 0 0 8px 0;
+}
+.modal .big {
+  font-size: 48px;
+  margin: 6px 0;
+  color: var(--accent);
+  font-weight: 800;
+}
+.modalBtns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 12px;
+}
+.modalBtns button {
+  padding: 10px 14px;
+  border-radius: 10px;
+}
+
+[data-theme="light"] .modalBtns button {
+  border-color: rgba(0, 0, 0, 0.06);
+  color: var(--muted);
+  background: var(--card);
+}
+.modal .small {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.newBest {
+  color: var(--accent);
+  font-weight: 800;
+  margin-left: 6px;
+}
+
+/* misc */
+footer {
+  margin-top: 14px;
+  color: var(--muted);
+  text-align: center;
+}
+@media (max-width: 540px) {
+  .cell {
+    width: 44px;
+    height: 44px;
+  }
+  .content {
+    gap: 12px;
+  }
+  .startWrap {
+    width: auto;
+  }
+  .progressBar {
+    height: 10px;
+  }
+}
+
+/* hint, restart, and attempt display */
+.hintRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+.hint {
+  background: rgba(0, 0, 0, 0.04);
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--muted);
+  width: 460px;
+  min-height: 36px;
+}
+.hint.placeholder {
+  opacity: 0.6;
+  font-style: italic;
+}
+.restartWrap {
+  display: flex;
+  align-items: center;
+}
+.restartBtn {
+  padding: 8px 12px;
+  background: var(--card);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--muted);
+}
+.scoreSmall {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* level, status, timer, nav action */
+.levelBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.levelBig {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--accent);
+}
+.statusLine {
+  font-size: 15px;
+  color: var(--muted);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.statusText {
+  font-weight: 700;
+  margin-left: 4px;
+}
+.timerBlock {
+  text-align: right;
+}
+.timeDisplay {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.progressTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.navAction {
+  width: 80px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-left: 8px;
+  background: var(--card);
+  border: 2px solid rgba(0, 0, 0, 0.06);
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 600;
+}
+.navAction:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* hint timing and small typography */
+.hint {
+  background: rgba(0, 0, 0, 0.04);
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--muted);
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+.hint.placeholder {
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* slightly bigger level text on small screens too */
+@media (max-width: 600px) {
+  .levelBig {
+    font-size: 20px;
+  }
+  .statusLine {
+    font-size: 14px;
+  }
+  .timeDisplay {
+    font-size: 16px;
+  }
+}
+
+/* confetti-related: nothing required, canvas is inserted on body */
+/* best score beat animation */
+@keyframes bestBeat {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 transparent);
+    color: var(--accent);
+  }
+  30% {
+    transform: scale(1.25);
+    filter: drop-shadow(0 8px 18px rgba(96, 165, 250, 0.18));
+    color: #ffd36b;
+  }
+  60% {
+    transform: scale(1.08);
+    filter: drop-shadow(0 6px 14px rgba(96, 165, 250, 0.12));
+    color: var(--accent);
+  }
+  100% {
+    transform: scale(1);
+    filter: none;
+    color: var(--accent);
+  }
+}
+.scoreCardValue.best-beat {
+  animation: bestBeat 900ms ease forwards;
+}
+
+/* little glow for 'new best' label */
+.newBest {
+  color: var(--accent);
+  font-weight: 800;
+  margin-left: 6px;
+  text-shadow: 0 6px 16px rgba(96, 165, 250, 0.18);
+}
+
+/* confetti safe fallback for small screens */
+@media (max-width: 480px) {
+  .scoreCardValue.best-beat {
+    transform-origin: center;
+  }
+}
+
+/* flashing tile colors - use variables so both themes contrast well */
+:root {
+  --flash-bg-start: rgba(96, 165, 250, 0.14);
+  --flash-bg-end: rgba(96, 165, 250, 0.28);
+  --flash-border: rgba(96, 165, 250, 0.45);
+  --flash-shadow: 0 10px 30px rgba(96, 165, 250, 0.12);
+}
+
+[data-theme="light"] {
+  --flash-bg-start: rgba(37, 99, 235, 0.18); /* deeper blue in light mode */
+  --flash-bg-end: rgba(37, 99, 235, 0.32);
+  --flash-border: rgba(37, 99, 235, 0.6);
+  --flash-shadow: 0 10px 30px rgba(37, 99, 235, 0.12);
+}
+
+/* stronger flashing styling, overrides previous .cell.flashing */
+.cell.flashing {
+  transform: scale(1.06);
+  box-shadow: var(--flash-shadow);
+  background: linear-gradient(
+    135deg,
+    var(--flash-bg-start),
+    var(--flash-bg-end)
+  );
+  border: 1px solid var(--flash-border);
+  /* subtle outline to separate from page bg */
+  outline: 2px solid rgba(255, 255, 255, 0.02);
+}
+
+/* tweak for light theme so flashing stands out on white */
+[data-theme="light"] .cell.flashing {
+  outline: 2px solid rgba(0, 0, 0, 0.04);
+}
+
+/* make navTheme svg use currentColor so icons are visible in both themes */
+.navTheme {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--muted);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* disabled Submit/Next should look like navAction styling (same look as Restart) */
+.bottomControls button:disabled,
+.bottomControls button[disabled] {
+  background: var(--card);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 1; /* keep opacity same so it looks like navAction rather than faded */
+  box-shadow: none;
+}
+
+/* ensure navAction disabled style consistent */
+.navAction:disabled {
+  opacity: 1;
+  cursor: not-allowed;
+  background: var(--card);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--muted);
+}
+
+/* hint timebox already handled in JS; add small transition for hint appearance */
+.hint {
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+/* minor: ensure flashing tiles contrast var previously set (keep existing) */
+.cell.flashing {
+  transform: scale(1.06);
+  box-shadow: var(--flash-shadow);
+  background: linear-gradient(
+    135deg,
+    var(--flash-bg-start),
+    var(--flash-bg-end)
+  );
+  border: 1px solid var(--flash-border);
+  outline: 2px solid rgba(255, 255, 255, 0.02);
+}
+[data-theme="light"] .cell.flashing {
+  outline: 2px solid rgba(0, 0, 0, 0.04);
+}
+
+/* Stop button styling (placed near other nav controls) */
+.navStop {
+  padding: 8px 19px;
+  margin-left: 8px;
+  background: #f97373; /* soft red */
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+.navStop:hover {
+  filter: brightness(0.95);
+}
+.navStop:active {
+  transform: translateY(1px);
+}
+
+/* ensure it aligns similar to navAction */
+.navControls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* keep navAction and disabled buttons appearance consistent */
+.navAction {
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-left: 8px;
+  background: var(--card);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--muted);
+  cursor: pointer;
+}
+.navAction:disabled {
+  opacity: 1;
+  cursor: not-allowed;
+  background: var(--card);
+  color: var(--muted);
+}
+
+/* ---------------------------
+   Responsive additions (append only)
+   --------------------------- */
+
+/* Make page and content fluid with sensible max-widths */
+.page {
+  width: 100%;
+  max-width: 1100px; /* keeps your desktop look but allows smaller screens */
+  padding: 16px;
+  margin: 0 auto;
+}
+
+/* NAVBAR responsiveness */
+.nav {
+  width: 100%;
+  max-width: 1100px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+}
+
+/* Brand scale-down on medium and small screens */
+@media (max-width: 900px) {
+  .brand {
+    font-size: 28px; /* smaller than desktop 45px but still prominent */
+    margin-bottom: 4px;
+  }
+
+  .nav {
+    height: auto;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .navControls {
+    gap: 6px;
+  }
+}
+
+/* Content: allow full width on narrow screens and stack columns (keeps your grid) */
+@media (max-width: 900px) {
+  .content {
+    grid-template-columns: 1fr;
+    width: 100%;
+    padding: 10px;
+    gap: 14px;
+  }
+
+  .main {
+    order: 1;
+    padding: 8px 6px;
+  }
+
+  .aside {
+    order: 2;
+    padding-top: 10px;
+    align-items: center;
+  }
+
+  /* make aside items centered and full width */
+  .aside .scoreCard,
+  .aside .bottomControls {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .hint {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+}
+
+/* Grid + cells responsive */
+@media (max-width: 700px) {
+  .grid {
+    gap: 8px;
+  }
+  .cell {
+    width: 52px;
+    height: 52px;
+    border-radius: 8px;
+  }
+  .bottomControls {
+    width: 100%;
+    justify-content: center;
+    gap: 10px;
+  }
+  .bottomControls button {
+    width: 46%;
+    min-width: 120px;
+  }
+  .scoreCard {
+    height: auto;
+    padding: 10px;
+  }
+  .scoreCardValue {
+    font-size: 30px;
+  }
+  .levelBig {
+    font-size: 20px;
+  }
+}
+
+/* Small phones — tighten spacing and decrease sizes */
+@media (max-width: 480px) {
+  body {
+    padding: 12px;
+  }
+  .nav {
+    padding: 10px;
+    border-radius: 10px;
+  }
+  .brand {
+    font-size: 20px;
+  }
+  .content {
+    padding: 8px;
+    gap: 12px;
+  }
+  .grid {
+    gap: 6px;
+  }
+  .cell {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+  }
+  .hint {
+    width: 100%;
+    padding: 8px;
+    font-size: 13px;
+  }
+  .scoreCardValue {
+    font-size: 26px;
+  }
+  .bottomControls {
+    width: 100%;
+    gap: 8px;
+    padding: 6px 0;
+  }
+  .bottomControls button {
+    width: 48%;
+    min-width: 110px;
+    font-size: 14px;
+    padding: 8px 10px;
+  }
+
+  /* Nav controls wrap if needed */
+  .navControls {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  /* Modal sizing */
+  .modal {
+    min-width: 92%;
+    margin: 10px;
+    padding: 18px;
+  }
+  .modal .big {
+    font-size: 36px;
+  }
+}
+
+/* Keep progress bar visible and reasonably sized */
+@media (max-width: 540px) {
+  .progressBar {
+    height: 10px;
+  }
+  .timeDisplay {
+    font-size: 16px;
+  }
+}
+
+/* Ensure focus outlines remain usable on small screens */
+@media (hover: none) {
+  .navAction:focus,
+  .navTheme:focus,
+  .navStop:focus,
+  .bottomControls button:focus,
+  .modalBtns button:focus {
+    outline: 2px solid rgba(96, 165, 250, 0.18);
+    outline-offset: 3px;
+  }
+}
+
+/* Prevent overflow on landscape phones */
+@media (max-height: 450px) and (max-width: 800px) {
+  .page {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .brand {
+    font-size: 18px;
+  }
+  .nav {
+    height: auto;
+  }
+}
+
+/* apply existing shake animation to all cells when container has .shake */
+.gameWrap.shake .cell {
+  animation: shake 0.36s;
+}
