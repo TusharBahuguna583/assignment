@@ -6,6 +6,7 @@ import Controls from "./components/Controls"
 import FinalModal from "./components/FinalModal"
 import { rules } from "./rules"
 import "./styles.css"
+import AsideScores from "./components/AsideScores"
 
 
 /* Confetti component (unchanged) */
@@ -253,7 +254,7 @@ export default function App() {
           const pool = candidates.length > 0 ? candidates : Array.from({ length: 25 }, (_, i) => i)
 
           // pattern length: choose something meaningful: level + 2, clamp to pool length * 2
-          const patternLength = Math.min(Math.max(3, lvl + 2), 12)
+          const patternLength = Math.min(Math.max(5, lvl + 4), 12)
 
           const newPattern: number[] = []
           for (let i = 0; i < patternLength; i++) {
@@ -581,19 +582,8 @@ export default function App() {
                               )}
                          </div>
                     </main>
-
-                    <aside className="aside">
-                         {/* Score cards */}
-                         <div className="scoreCard">
-                              <div className="scoreCardTitle">Current Score</div>
-                              <div className="scoreCardValue">{score}</div>
-                              <div className="scoreSmall">Level attempts: {currentGuesses}</div>
-                         </div>
-
-                         <div className="scoreCard">
-                              <div className="scoreCardTitle">Best Score</div>
-                              <div className={`scoreCardValue ${newBestThisRun ? "best-beat" : ""}`}>{best}</div>
-                         </div>
+                    <aside>
+                         <AsideScores score={score} best={best} newBestThisRun={newBestThisRun} currentGuesses={currentGuesses} />
 
                          {/* Controls live here in the aside */}
                          <div style={{ marginTop: 8 }}>

@@ -18,9 +18,6 @@ export default function TopBar({ level, phase, timeLeft, totalTime }: Props) {
             <div className="levelBig">Level {level}</div>
             <div className="statusLine">{statusEmoji} <span className="statusText">{statusText}</span></div>
           </div>
-          <div className="timerBlock">
-            <div className="timeDisplay">{phase === "flashing" ? `${timeLeft}s` : " "}</div>
-          </div>
         </div>
 
         <div className="progressBar">
